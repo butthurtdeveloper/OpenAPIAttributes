@@ -4,25 +4,22 @@ namespace OpenAPI\Properties;
 
 use OpenApi\Attributes as OA;
 
-class PropertyString extends OA\Property
+class PropertyBool extends OA\Property
 {
     public function __construct(
         string $property,
         bool $nullable = false,
-        string $example = 'Some string',
-        ?string $description = null,
-        ?string $format = null,
+        ?string $description = null
     ) {
         if ($nullable) {
             return parent::__construct(
                 property: $property,
                 description: $description,
-                format: $format,
-                example: $example,
+                example: true,
                 nullable: true,
                 anyOf: [
                     new OA\Schema(
-                        type: 'string',
+                        type: 'boolean',
                     ),
                     new OA\Schema(
                         type: 'null',
@@ -34,10 +31,8 @@ class PropertyString extends OA\Property
         parent::__construct(
             property: $property,
             description: $description,
-            type: 'string',
-            format: $format,
-            example: $example,
-            nullable: false,
+            type: 'boolean',
+            example: true,
         );
     }
 }

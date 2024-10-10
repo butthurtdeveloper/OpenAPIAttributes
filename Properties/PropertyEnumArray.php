@@ -4,25 +4,29 @@ namespace OpenAPI\Properties;
 
 use OpenApi\Attributes as OA;
 
-class PropertyString extends OA\Property
+class PropertyEnumArray extends OA\Property
 {
     public function __construct(
         string $property,
+        string $enum,
         bool $nullable = false,
-        string $example = 'Some string',
-        ?string $description = null,
-        ?string $format = null,
+        ?string $example = null,
     ) {
+        $className = (new \ReflectionClass($enum))->getShortName();
+        $ref = "#/components/schemas/{$className}";
+
+        $exampleElement = $enum::cases()[0];
+        $example = $example ?? [$exampleElement?->value ?? $exampleElement->name];
+
         if ($nullable) {
             return parent::__construct(
                 property: $property,
-                description: $description,
-                format: $format,
                 example: $example,
                 nullable: true,
                 anyOf: [
                     new OA\Schema(
-                        type: 'string',
+                        type: 'array',
+                        items: new OA\Items(ref: $ref),
                     ),
                     new OA\Schema(
                         type: 'null',
@@ -30,14 +34,11 @@ class PropertyString extends OA\Property
                 ]
             );
         }
-
         parent::__construct(
             property: $property,
-            description: $description,
-            type: 'string',
-            format: $format,
-            example: $example,
-            nullable: false,
+            type: 'array',
+            items: new OA\Items(ref: $ref),
+            example: $example
         );
     }
 }

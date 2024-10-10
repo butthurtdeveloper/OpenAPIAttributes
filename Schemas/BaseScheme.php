@@ -16,12 +16,13 @@ class BaseScheme extends OA\Schema
         string $resource,
         array $properties,
         ?array $required = null,
-        ?bool $additionalProperties = false
+        ?bool $additionalProperties = false,
+        ?array $sometimes = []
     ) {
         $className = (new ReflectionClass($resource))->getShortName();
 
-        $required ??= array_reduce($properties, function (array $result, OA\Property $property) {
-            if ($property->required) {
+        $required ??= array_reduce($properties, function (array $result, OA\Property $property) use ($sometimes) {
+            if ($property->required && ! in_array($property->property, $sometimes)) {
                 $result[] = $property->property;
             }
             return $result;

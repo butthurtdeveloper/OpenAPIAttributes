@@ -3,26 +3,30 @@
 namespace OpenAPI\Properties;
 
 use OpenApi\Attributes as OA;
+use ReflectionClass;
+use ReflectionException;
 
-class PropertyString extends OA\Property
+class PropertyResource extends OA\Property
 {
+    /**
+     * @throws ReflectionException
+     */
     public function __construct(
         string $property,
-        bool $nullable = false,
-        string $example = 'Some string',
-        ?string $description = null,
-        ?string $format = null,
+        string $resource,
+        ?bool $nullable = false,
+        ?string $description = null
     ) {
+        $className = (new ReflectionClass($resource))->getShortName();
+        $ref = "#/components/schemas/{$className}";
         if ($nullable) {
             return parent::__construct(
                 property: $property,
                 description: $description,
-                format: $format,
-                example: $example,
                 nullable: true,
                 anyOf: [
                     new OA\Schema(
-                        type: 'string',
+                        ref: $ref
                     ),
                     new OA\Schema(
                         type: 'null',
@@ -30,14 +34,12 @@ class PropertyString extends OA\Property
                 ]
             );
         }
-
         parent::__construct(
             property: $property,
+            ref: $ref,
             description: $description,
-            type: 'string',
-            format: $format,
-            example: $example,
-            nullable: false,
+            type: 'object',
+            nullable: $nullable
         );
     }
 }
